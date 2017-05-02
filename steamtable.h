@@ -26,6 +26,8 @@ private slots:
 
     void on_EnglishButton_clicked();
 
+    void on_resetButton_clicked();
+
 private:
     Ui::steamTable *ui;
 };

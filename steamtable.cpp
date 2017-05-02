@@ -24,8 +24,22 @@ void steamTable::on_calcButton_clicked()
 
     temperature = ui->tempEdit->text();//ui->tempEdit->value();
     pressure = ui->presEdit->text();
-    ui->enthalpyEdit->setText(QString::number(hmass_Tp(temperature.toDouble(), pressure.toDouble())/1000));
-    ui->densityEdit->setText(QString::number(rhomass_Tp(temperature.toDouble(), pressure.toDouble())));
+
+    if(ui->MKSButton->isChecked()){
+        ui->enthalpyEdit->setText(QString::number(hmass_Tp(temperature.toDouble()+273.15, pressure.toDouble())/1000));
+        ui->densityEdit->setText(QString::number(rhomass_Tp(temperature.toDouble()+273.15, pressure.toDouble())));
+    }
+
+    if(ui->SIButton->isChecked()){
+        ui->enthalpyEdit->setText(QString::number(hmass_Tp(temperature.toDouble(), pressure.toDouble())/1000));
+        ui->densityEdit->setText(QString::number(rhomass_Tp(temperature.toDouble(), pressure.toDouble())));
+    }
+
+    if(ui->EnglishButton->isChecked()){
+        ui->enthalpyEdit->setText(QString::number(hmass_Tp(((temperature.toDouble()-32.0)/1.8) +273.15, pressure.toDouble())/1000));
+        ui->densityEdit->setText(QString::number(rhomass_Tp(((temperature.toDouble()-32.0)/1.8)+273.15, pressure.toDouble())));
+    }
+
 
 }
 
@@ -47,4 +61,13 @@ void steamTable::on_EnglishButton_clicked()
 {
     ui->tempUnit->setText("deg F");
     ui->presUnit->setText("psi");
+}
+
+void steamTable::on_resetButton_clicked()
+{
+    ui->tempEdit->setText("");
+    ui->presEdit->setText("");
+
+    ui->enthalpyEdit->setText("");
+    ui->densityEdit->setText("");
 }
