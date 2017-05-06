@@ -17,10 +17,10 @@
    <widget class="QLabel" name="label">
     <property name="geometry">
      <rect>
-      <x>40</x>
-      <y>50</y>
-      <width>101</width>
-      <height>17</height>
+      <x>41</x>
+      <y>41</y>
+      <width>62</width>
+      <height>16</height>
      </rect>
     </property>
     <property name="text">
@@ -30,10 +30,10 @@
    <widget class="QLabel" name="label_2">
     <property name="geometry">
      <rect>
-      <x>40</x>
-      <y>80</y>
-      <width>67</width>
-      <height>17</height>
+      <x>41</x>
+      <y>67</y>
+      <width>42</width>
+      <height>16</height>
      </rect>
     </property>
     <property name="text">
@@ -43,21 +43,27 @@
    <widget class="QLineEdit" name="tempEdit">
     <property name="geometry">
      <rect>
-      <x>150</x>
-      <y>40</y>
-      <width>81</width>
-      <height>27</height>
+      <x>109</x>
+      <y>41</y>
+      <width>133</width>
+      <height>20</height>
      </rect>
+    </property>
+    <property name="placeholderText">
+     <string>Temperature</string>
     </property>
    </widget>
    <widget class="QLineEdit" name="presEdit">
     <property name="geometry">
      <rect>
-      <x>150</x>
-      <y>70</y>
-      <width>81</width>
-      <height>27</height>
+      <x>109</x>
+      <y>67</y>
+      <width>133</width>
+      <height>20</height>
      </rect>
+    </property>
+    <property name="placeholderText">
+     <string>Pressure</string>
     </property>
    </widget>
    <widget class="QGroupBox" name="groupBox">
@@ -65,7 +71,7 @@
      <rect>
       <x>30</x>
       <y>20</y>
-      <width>281</width>
+      <width>311</width>
       <height>111</height>
      </rect>
     </property>
@@ -75,10 +81,10 @@
     <widget class="QLabel" name="tempUnit">
      <property name="geometry">
       <rect>
-       <x>220</x>
-       <y>20</y>
-       <width>67</width>
-       <height>17</height>
+       <x>221</x>
+       <y>21</y>
+       <width>28</width>
+       <height>16</height>
       </rect>
      </property>
      <property name="text">
@@ -88,10 +94,10 @@
     <widget class="QLabel" name="presUnit">
      <property name="geometry">
       <rect>
-       <x>220</x>
-       <y>60</y>
-       <width>67</width>
-       <height>17</height>
+       <x>221</x>
+       <y>49</y>
+       <width>41</width>
+       <height>16</height>
       </rect>
      </property>
      <property name="text">
@@ -105,50 +111,47 @@
       <x>360</x>
       <y>20</y>
       <width>151</width>
-      <height>131</height>
+      <height>111</height>
      </rect>
     </property>
     <property name="title">
      <string>Units</string>
     </property>
-    <widget class="QRadioButton" name="SIButton">
+    <widget class="QWidget" name="">
      <property name="geometry">
       <rect>
        <x>10</x>
        <y>30</y>
-       <width>117</width>
-       <height>22</height>
+       <width>58</width>
+       <height>65</height>
       </rect>
      </property>
-     <property name="text">
-      <string>SI</string>
-     </property>
-    </widget>
-    <widget class="QRadioButton" name="MKSButton">
-     <property name="geometry">
-      <rect>
-       <x>10</x>
-       <y>60</y>
-       <width>117</width>
-       <height>22</height>
-      </rect>
-     </property>
-     <property name="text">
-      <string>MKS</string>
-     </property>
-    </widget>
-    <widget class="QRadioButton" name="EnglishButton">
-     <property name="geometry">
-      <rect>
-       <x>10</x>
-       <y>90</y>
-       <width>117</width>
-       <height>22</height>
-      </rect>
-     </property>
-     <property name="text">
-      <string>English</string>
-     </property>
+     <layout class="QVBoxLayout" name="verticalLayout">
+      <item>
+       <widget class="QRadioButton" name="SIButton">
+        <property name="text">
+         <string>SI</string>
+        </property>
+        <property name="checked">
+         <bool>true</bool>
+        </property>
+       </widget>
+      </item>
+      <item>
+       <widget class="QRadioButton" name="MKSButton">
+        <property name="text">
+         <string>MKS</string>
+        </property>
+       </widget>
+      </item>
+      <item>
+       <widget class="QRadioButton" name="EnglishButton">
+        <property name="text">
+         <string>English</string>
+        </property>
+       </widget>
+      </item>
+     </layout>
     </widget>
    </widget>
    <widget class="QGroupBox" name="groupBox_3">
@@ -163,86 +166,98 @@
     <property name="title">
      <string>Results</string>
     </property>
-    <widget class="QLabel" name="label_3">
+    <widget class="QWidget" name="">
      <property name="geometry">
       <rect>
        <x>30</x>
-       <y>40</y>
-       <width>67</width>
-       <height>17</height>
-      </rect>
-     </property>
-     <property name="text">
-      <string>Enthalpy </string>
-     </property>
-    </widget>
-    <widget class="QLineEdit" name="enthalpyEdit">
-     <property name="geometry">
-      <rect>
-       <x>120</x>
        <y>30</y>
-       <width>113</width>
-       <height>27</height>
+       <width>224</width>
+       <height>74</height>
       </rect>
      </property>
-     <property name="cursor">
-      <cursorShape>IBeamCursor</cursorShape>
-     </property>
-     <property name="readOnly">
-      <bool>false</bool>
-     </property>
-    </widget>
-    <widget class="QLabel" name="label_4">
-     <property name="geometry">
-      <rect>
-       <x>30</x>
-       <y>70</y>
-       <width>67</width>
-       <height>17</height>
-      </rect>
-     </property>
-     <property name="text">
-      <string>Density</string>
-     </property>
-    </widget>
-    <widget class="QLineEdit" name="densityEdit">
-     <property name="geometry">
-      <rect>
-       <x>120</x>
-       <y>60</y>
-       <width>113</width>
-       <height>27</height>
-      </rect>
-     </property>
-     <property name="readOnly">
-      <bool>false</bool>
-     </property>
-    </widget>
-    <widget class="QLabel" name="enthalpyUnit">
-     <property name="geometry">
-      <rect>
-       <x>250</x>
-       <y>30</y>
-       <width>67</width>
-       <height>17</height>
-      </rect>
-     </property>
-     <property name="text">
-      <string>kJ/ kg</string>
-     </property>
-    </widget>
-    <widget class="QLabel" name="densityUnit">
-     <property name="geometry">
-      <rect>
-       <x>250</x>
-       <y>70</y>
-       <width>67</width>
-       <height>17</height>
-      </rect>
-     </property>
-     <property name="text">
-      <string>kg/ m3</string>
-     </property>
+     <layout class="QGridLayout" name="gridLayout">
+      <item row="0" column="0">
+       <widget class="QLabel" name="label_3">
+        <property name="text">
+         <string>Enthalpy </string>
+        </property>
+       </widget>
+      </item>
+      <item row="0" column="1">
+       <widget class="QLineEdit" name="enthalpyEdit">
+        <property name="cursor">
+         <cursorShape>IBeamCursor</cursorShape>
+        </property>
+        <property name="layoutDirection">
+         <enum>Qt::RightToLeft</enum>
+        </property>
+        <property name="inputMask">
+         <string/>
+        </property>
+        <property name="readOnly">
+         <bool>true</bool>
+        </property>
+        <property name="placeholderText">
+         <string>Enthalpy</string>
+        </property>
+       </widget>
+      </item>
+      <item row="0" column="2">
+       <widget class="QLabel" name="enthalpyUnit">
+        <property name="text">
+         <string>kJ/ kg</string>
+        </property>
+       </widget>
+      </item>
+      <item row="1" column="0">
+       <widget class="QLabel" name="label_4">
+        <property name="text">
+         <string>Density</string>
+        </property>
+       </widget>
+      </item>
+      <item row="1" column="1">
+       <widget class="QLineEdit" name="densityEdit">
+        <property name="readOnly">
+         <bool>true</bool>
+        </property>
+        <property name="placeholderText">
+         <string>Density</string>
+        </property>
+       </widget>
+      </item>
+      <item row="1" column="2">
+       <widget class="QLabel" name="densityUnit">
+        <property name="text">
+         <string>kg/ m3</string>
+        </property>
+       </widget>
+      </item>
+      <item row="2" column="0">
+       <widget class="QLabel" name="label_6">
+        <property name="text">
+         <string>Sat. Liq</string>
+        </property>
+       </widget>
+      </item>
+      <item row="2" column="1">
+       <widget class="QLineEdit" name="satLiqEnthalpyEdit">
+        <property name="readOnly">
+         <bool>true</bool>
+        </property>
+        <property name="placeholderText">
+         <string>Saturated Liq Enthalpy</string>
+        </property>
+       </widget>
+      </item>
+      <item row="2" column="2">
+       <widget class="QLabel" name="satLiqEnthalpyUnit">
+        <property name="text">
+         <string>kJ/ kg</string>
+        </property>
+       </widget>
+      </item>
+     </layout>
     </widget>
    </widget>
    <widget class="QPushButton" name="calcButton">
@@ -289,7 +304,7 @@
      <string>Temperature Range: </string>
     </property>
    </widget>
-   <widget class="QWidget" name="">
+   <widget class="QWidget" name="layoutWidget">
     <property name="geometry">
      <rect>
       <x>0</x>
@@ -300,6 +315,25 @@
     </property>
     <layout class="QHBoxLayout" name="horizontalLayout"/>
    </widget>
+   <widget class="QFrame" name="frame">
+    <property name="geometry">
+     <rect>
+      <x>10</x>
+      <y>0</y>
+      <width>551</width>
+      <height>441</height>
+     </rect>
+    </property>
+    <property name="frameShape">
+     <enum>QFrame::StyledPanel</enum>
+    </property>
+    <property name="frameShadow">
+     <enum>QFrame::Raised</enum>
+    </property>
+    <zorder>label_5</zorder>
+   </widget>
+   <zorder>frame</zorder>
+   <zorder>layoutWidget</zorder>
    <zorder>groupBox</zorder>
    <zorder>label</zorder>
    <zorder>label_2</zorder>
@@ -317,7 +351,7 @@
      <x>0</x>
      <y>0</y>
      <width>577</width>
-     <height>25</height>
+     <height>21</height>
     </rect>
    </property>
   </widget>
