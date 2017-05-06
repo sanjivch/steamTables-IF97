@@ -21,7 +21,7 @@ void steamTable::on_calcButton_clicked()
 {
     QString temperature, pressure;
 
-
+    //change pressure units
     temperature = ui->tempEdit->text();//ui->tempEdit->value();
     pressure = ui->presEdit->text();
 
@@ -49,18 +49,24 @@ void steamTable::on_SIButton_clicked()
 {
     ui->tempUnit->setText("deg K");
     ui->presUnit->setText("Pa");
+    ui->enthalpyUnit->setText("kJ/ kg");
+    ui->densityUnit->setText("kg/ m3");
 }
 
 void steamTable::on_MKSButton_clicked()
 {
     ui->tempUnit->setText("deg C");
     ui->presUnit->setText("kg/m. s2");
+    ui->enthalpyUnit->setText("kcal/ kg");
+    ui->densityUnit->setText("kg/ m3");
 }
 
 void steamTable::on_EnglishButton_clicked()
 {
     ui->tempUnit->setText("deg F");
     ui->presUnit->setText("psi");
+    ui->enthalpyUnit->setText("Btu/ lb");
+    ui->densityUnit->setText("lb/ ft3");
 }
 
 void steamTable::on_resetButton_clicked()
