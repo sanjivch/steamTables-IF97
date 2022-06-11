@@ -9,6 +9,8 @@ Steam Tables based on IAPWS-IF97
 import numpy as np
 import math
 import matplotlib.pyplot as plt
+import streamlit as st
+
 
 #==============================================================================
 # Reference constants
@@ -72,12 +74,10 @@ def prop(p,T):
     #w_pT = (1000 * R * T * gamma_pi ** 2 / ((gamma_pi tau * gamma_pitau) ** 2 / (tau ** 2 * gamma_tautau) gamma_pipi)) ** 0.5
     
     
-    #print gamma, gamma_pi, gamma_tau
-    print v_pT, h_pT, s_pT, Cp_pT, Cv_pT, u_pT#, w_pT
+    #print(gamma, gamma_pi, gamma_tau
+    return v_pT, h_pT, s_pT, Cp_pT, Cv_pT, u_pT#, w_pT
     
-#prop(3.0,300.0)
-#prop(80.0,300.0)
-#prop(3.0,500.0)
+
 
 
 #==============================================================================
@@ -99,7 +99,7 @@ def T(p,h):
     
     
     theta = np.sum(n1*pi**I1 * (eta+1)**J1)
-    print theta
+    print(theta)
     
 #T(3.0,500.0)
 #T(80.0, 500.0)
@@ -122,7 +122,7 @@ def T1(p,s):
     sigma = s/1.0    
     
     theta = np.sum(n1*pi**I1 * (sigma+2)**J1)
-    print theta
+    print(theta)
     
 #T1(3.0,0.5)
 #T1(80.0,0.5)
@@ -146,7 +146,7 @@ def p_hs(h,s):
     sigma = s / 7.6
     
     pi = np.sum(n1*(eta+0.05)**I1 *(sigma+0.05)**J1) * 100.0
-    print pi
+    print(pi)
     
 #p_hs(0.001,0.0)
 #p_hs(90.0,0.0)
@@ -195,23 +195,23 @@ def prop2(p,T):
     
     #Specific Volume m3/kg
     v_pT = R*T*pi*gamma_pi*0.001/p 
-    print v_pT
+    print(v_pT)
     
     #Specific enthalpy
     h_pT = R*T*tau*gamma_tau
-    print h_pT
+    print(h_pT)
     
     #Specific entropy
     s_pT =R*(tau*gamma_tau-gamma)
-    print s_pT
+    print(s_pT)
     
     #Specific internal energy
     u_pT = R*T*(tau*gamma_tau -pi*gamma_pi)
-    print u_pT
+    print(u_pT)
     
     #Specific Heat at constant pressure
     Cp_pT = -R*tau*tau*gamma_tautau
-    print Cp_pT
+    print(Cp_pT)
     
     #TODO Speed of sound
     
@@ -277,13 +277,13 @@ def T2_ph(p,h):
     
     if p < 4:
          Ta_ph = np.sum(na*pi**Ia * (eta-2.1)**Ja)
-         print Ta_ph
+         print(Ta_ph)
     elif p < (905.84278514723 - 0.67955786399241 * h + 1.2809002730136E-04 * h*h):
         Tb_ph = np.sum(nb*(pi-2)**Ib * (eta-2.6)**Jb)
-        print Tb_ph
+        print(Tb_ph)
     else:
         Tc_ph = np.sum(nc*(pi+25)**Ic * (eta-1.8)**Jc)
-        print Tc_ph
+        print(Tc_ph)
         
         
 T2_ph(40.0,2700.0)
@@ -323,15 +323,15 @@ def T2_ps(p,s):
     if p < 4:
         sigma = s / 2.0
         Ta_ps = np.sum(na*pi**Ia * (sigma-2)**Ja)
-        print Ta_ps
+        print(Ta_ps)
     elif s < 5.85:
         sigma = s / 2.9251
         Tc_ps = np.sum(nc*pi**Ic * (2-sigma)**Jc)
-        print Tc_ps       
+        print(Tc_ps)       
     else:
         sigma = s / 0.7853
         Tb_ps = np.sum(nb*pi**Ib * (10-sigma)**Jb)
-        print Tb_ps
+        print(Tb_ps)
         
 T2_ps(20.0,5.75)
 T2_ps(80.0,5.25)
@@ -375,17 +375,17 @@ def p2_hs(h,s):
         eta = h / 4200.0
         sigma = s / 12.0
         p2a_hs = 4*np.sum(na*(eta-0.5)**Ia * (sigma-1.2)**Ja)**4
-        print p2a_hs
+        print(p2a_hs)
     elif s < 5.85:
         eta = h / 3500.0
         sigma = s / 5.9
         p2c_hs = 100*np.sum(nc*(eta-0.7)**Ic * (sigma-1.1)**Jc)**4
-        print p2c_hs
+        print(p2c_hs)
     else:
         eta = h / 4100.0
         sigma = s / 7.9
         p2b_hs = 100*np.sum(nb*(eta-0.6)**Ib * (sigma-1.01)**Jb)**4
-        print p2b_hs
+        print(p2b_hs)
         
 
 p2_hs(2800.0,5.10)
@@ -395,3 +395,41 @@ p2_hs(3400.0,5.8)
 #==============================================================================
 # REGION III
 #==============================================================================
+
+st.set_page_config(layout='wide')
+
+st.title('Steam Tables - IAPWS IF-97')
+
+st.sidebar.write('This web application calculates steam and water properties like Enthalpy, Entropy, Density, Saturation Temperature and Pressure, Degree Superheat for specified Pressure and Temperature.')
+st.sidebar.selectbox('Units', ['SI', "MKS"])
+
+st.subheader("Properties")
+temperature_property = st.checkbox("Temperature")
+pressure_property = st.checkbox("Pressure")
+
+temperature = st.number_input('Temperature')
+pressure = st.number_input('Pressure')
+
+st.subheader("Results")
+result = prop(pressure, temperature)
+st.write(result)
+# #Specific Volume (m3/kg)
+#     v_pT = gamma_pi*pi*R*T*0.001/p
+    
+#     #Specific Enthalpy (kJ/kg)
+#     h_pT = tau*gamma_tau*R*T
+    
+#     #Specific Entropy
+#     s_pT = R*(tau*gamma_tau - gamma)    
+    
+#     #Specific Heat capactiy at constant pressure, Cp 
+#     Cp_pT = -tau**2 *gamma_tautau*R
+    
+#     #Specific Heat capacity at constant volume, Cv
+#     Cv_pT = Cp_pT-R
+    
+#     #Specific Internal Energy
+#     u_pT = (tau*gamma_tau - pi*gamma_pi)*R*T
+#prop(3.0,300.0)
+#prop(80.0,300.0)
+#prop(3.0,500.0)
