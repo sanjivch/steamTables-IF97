@@ -3,9 +3,11 @@
 
 #include <vector>
 #include <cmath>
+#include <algorithm>
 #include <iostream>
 #include <iomanip>      // std::setprecision
 #include <stdexcept>
+#include <stdio.h>
 
 enum IF97parameters {IF97_DMASS, IF97_HMASS, IF97_T, IF97_P, IF97_SMASS, IF97_UMASS, IF97_CPMASS, IF97_CVMASS, IF97_W, IF97_DRHODP,
                     // Transport Property enumerations
@@ -28,13 +30,18 @@ struct RegionResidualElement      // Structure for the double indexed state equa
 namespace IF97
 {    
     // CoolProp-IF97 Version Number
-    static char IF97VERSION [] = "v2.1.0";
+    static char IF97VERSION [] = "v2.1.3";
     // Setup Water Constants for Trivial Functions and use in Region Classes
     // Constant values from:
     // Revised Release on the IAPWS Industrial Formulation 1997
     //     for the Thermodynamic Properties of Water and Steam, August 2007
     // IAPWS G5-01(2016), Guideline on the Use of Fundamental Physical Constants
     //      and Basic Constants of Water
+    // * IAPWS constants use units of MPa and kJ and are entered as such, but converted as needed to SI
+    //         depending on the definition of IAPWS_UNITS below.  Main program can define IAPWS_UNITS
+    //         to leave all input/output values in IAPWS units, which is handy for results verification
+    //         against values printed in the IAPWS documents.  CoolProp will never use this definition.
+    //         Converted constants below are commented with an *.
 #ifdef IAPWS_UNITS
     const double p_fact  = 1.0;                 // Leaves Thermodynamic Properties in IAPWS units of MPa
     const double R_fact  = 1.0;                 // Leaves Thermodynamic Properties in IAPWS units of kJ
@@ -44,40 +51,41 @@ namespace IF97
 #endif
     // IF97 Constants
     const double Tcrit   = 647.096;             // K
-    const double Pcrit   = 22.064*p_fact;       // Pa
-    const double Rhocrit = 322.0;               // kg/m³
-    const double Scrit   = 4.41202148223476*R_fact; // J/kg-K (needed for backward eqn. in Region 3(a)(b)
+    const double Pcrit   = 22.064*p_fact;       // MPa*
+    const double Rhocrit = 322.0;               // kg/mÂ³
+    const double Scrit   = 4.41202148223476*R_fact; // kJ*/kg-K (needed for backward eqn. in Region 3(a)(b)
     const double Ttrip   = 273.16;              // K
-    const double Ptrip   = 0.000611656*p_fact;  // Pa
+    const double Ptrip   = 0.000611656*p_fact;  // MPa*
     const double Tmin    = 273.15;              // K
     const double Tmax    = 1073.15;             // K
-    const double Pmin    = 0.000611213*p_fact;  // Pa
-    const double Pmax    = 100.0*p_fact;        // Pa
-    const double Rgas    = 0.461526*R_fact;     // J/kg-K : mass based!
+    const double Pmin    = 0.000611213*p_fact;  // MPa*
+    const double Pmax    = 100.0*p_fact;        // MPa*
+    const double Rgas    = 0.461526*R_fact;     // kJ*/kg-K : mass based!
     const double MW      = 0.018015268;         // kg/mol
     // Bounds for Region Determination
     const double Text    = 2273.15;             // Extended (Region 5) Temperature Limit (Region 5) [K]
-    const double Pext    = 50.0*p_fact;         // Extended (Region 5) Pressure Limit (Region 5) [Pa]
-    const double P23min  = 16.529164252605*p_fact; // Min Pressure on Region23 boundary curve; Max is Pmax
+    const double Pext    = 50.0*p_fact;         // Extended (Region 5) Pressure Limit (Region 5) [MPa*]
+    const double P23min  = 16.529164252605*p_fact; // Min Pressure [MPa*] on Region23 boundary curve; Max is Pmax
     const double T23min  = 623.15;              // Min Temperature on Region23 boundary curve
     const double T23max  = 863.15;              // Max Temperature on Region23 boundary curve
-    const double P2bcmin = 6.54670*p_fact;      // Min Pressure [MPa] on H2b2c boundary curve; Max is Pmax
-    const double S2bc    = 5.85*R_fact;         // Min Pressure [MPa] on H2b2c boundary curve; Max is Pmax
+    const double P2amax  = 4.0*p_fact;          // Max Pressure [MPa*] on upper H2a2b boundary (straight line)
+    const double P2bcmin = 6.54670*p_fact;      // Min Pressure [MPa*] on H2b2c boundary curve; Max is Pmax
+    const double S2bc    = 5.85*R_fact;         // Min Pressure [MPa*] on H2b2c boundary curve; Max is Pmax
     // Bounds for Backward p(h,s), t(h,s) Determination
-    const double Smin    = 0.0;                         // Min Entropy [kJ/kg-K] for Backward p(h,s)
-    const double Smax    = 11.921054825051103*R_fact;   // Max Entropy [kJ/kg-K] for Backward p(h,s)
-    const double STPmax  = 6.04048367171238*R_fact;     // S(Tmax,Pmax)
-    const double Sgtrip  = 9.155492076509681*R_fact;    // Sat. Vapor  Entropy [kJ/kg-K] at Triple Point
-    const double Sftrip  = -4.09187776773977E-7*R_fact; // Sat. Liquid Entropy [kJ/kg-K] at Triple Point
-    const double Hgtrip  = 2500.9109532932*R_fact;      // Sat. Vapor  Enthalpy [kJ/kg] at Triple Point
-    const double Hftrip  = 5.16837786577998E-4*R_fact;  // Sat. Liquid Enthalpy [kJ/kg] at Triple Point
-    const double SfT23   = 3.778281340*R_fact;          // Sat. Liquid Entropy [KJ/kg-K] at T23min
-    const double SgT23   = 5.210887825*R_fact;          // Sat. Vapor  Entropy [KJ/kg-K] at T23min
-    const double S13min  = 3.397782955*R_fact;          // Entropy at (T13,Pmax)
-    const double S23min  = 5.048096828*R_fact;          // B23 Bounding Box
-    const double S23max  = 5.260578707*R_fact;          // B23 Bounding Box
-    const double H23min  = 2.563592004E3*R_fact;        // B23 Bounding Box
-    const double H23max  = 2.812942061E3*R_fact;        // B23 Bounding Box
+    const double Smin    = 0.0;                         // Min Entropy [kJ*/kg-K] for Backward p(h,s)
+    const double Smax    = 11.921054825051103*R_fact;   // Max Entropy [kJ*/kg-K] for Backward p(h,s)
+    const double STPmax  = 6.04048367171238*R_fact;     // S(Tmax,Pmax) [kJ*/kg-K]
+    const double Sgtrip  = 9.155492076509681*R_fact;    // Sat. Vapor  Entropy [kJ*/kg-K] at Triple Point
+    const double Sftrip  = -4.09187776773977E-7*R_fact; // Sat. Liquid Entropy [kJ*/kg-K] at Triple Point
+    const double Hgtrip  = 2500.9109532932*R_fact;      // Sat. Vapor  Enthalpy [kJ*/kg] at Triple Point
+    const double Hftrip  = 5.16837786577998E-4*R_fact;  // Sat. Liquid Enthalpy [kJ*/kg] at Triple Point
+    const double SfT23   = 3.778281340*R_fact;          // Sat. Liquid Entropy [KJ*/kg-K] at T23min
+    const double SgT23   = 5.210887825*R_fact;          // Sat. Vapor  Entropy [KJ*/kg-K] at T23min
+    const double S13min  = 3.397782955*R_fact;          // Entropy at (T13,Pmax) [kJ*/kg-K]
+    const double S23min  = 5.048096828*R_fact;          // B23 Bounding Box [kJ*/kg-K]
+    const double S23max  = 5.260578707*R_fact;          // B23 Bounding Box [kJ*/kg-K]
+    const double H23min  = 2.563592004E3*R_fact;        // B23 Bounding Box [kJ*/kg-K]
+    const double H23max  = 2.812942061E3*R_fact;        // B23 Bounding Box [kJ*/kg-K]
     //
     double Tsat97(double p);  // Forward declaration of Tsat97 required for calls below.
     double psat97(double T);  // Forward declaration of psat97 required for calls below.
@@ -2386,7 +2394,7 @@ namespace IF97
         //    The equation is rearranged to solve for rho and turned
         //    into functions f(T,P,rho0) and f'(T,P,rho0) for the
         //    Newton-Raphson technique.  Functions for
-        //    dphi/ddelta and d²phi/ddelta² were also required.  These
+        //    dphi/ddelta and dÂ²phi/ddeltaÂ² were also required.  These
         //    additional Taylor functions are defined above.
         //
         double f(double T, double p, double rho0) const{
@@ -4017,20 +4025,24 @@ namespace IF97
                        else
                            return B1S.T_pX(p,X);
                        break;
-        case REGION_2: if (inkey == IF97_HMASS){
-                           if (p <= 4.0*p_fact)
-                               return B2aH.T_pX(p,X);
-                           else if (X >= Backwards::H2b2c_p(p))
-                               return B2bH.T_pX(p,X);
-                           else
-                               return B2cH.T_pX(p,X);
-                       } else {
-                           if (p <= 4.0*p_fact)
-                               return B2aS.T_pX(p,X);
-                           else if (X >= S2bc)
-                               return B2bS.T_pX(p,X);
-                           else 
-                               return B2cS.T_pX(p,X);
+        case REGION_2: if (inkey == IF97_HMASS){                 // See where we are in Region 2 (H)...
+                           if (p <= P2amax)                        // If p below max pressure in reverse subregion 2a,
+                               return B2aH.T_pX(p,X);              //     then use sub-Region 2a formulation
+                           else if (p <= P2bcmin)                  // ELSE If p below min end of 2b/2c curve,           
+                               return B2bH.T_pX(p,X);              //     use sub-Region 2b formulation by default
+                           else if (X >= Backwards::H2b2c_p(p))    // ELSE If h to the right of the 2b/2c curve,
+                               return B2bH.T_pX(p,X);              //     use sub-Region 2b formulation
+                           else                                    // ELSE we're left of the 2b/2c curve, so
+                               return B2cH.T_pX(p,X);              //     use sub-Region 2c formulation
+                       } else {                                  // See where we are in Region 2 (S)...
+                           if (p <= P2amax)                        // If p below max pressure in reverse subregion 2a,
+                               return B2aS.T_pX(p,X);              //     then use sub-Region 2a formulation
+                           else if (p <= P2bcmin)                  // ELSE If p below min end of 2b/2c curve,           
+                               return B2bS.T_pX(p, X);             //     use sub-Region 2b formulation by default
+                           else if (X >= S2bc)                     // ELSE If s to the right of S2bc boundary,
+                               return B2bS.T_pX(p,X);              //     use sub-Region 2b formulation
+                           else                                    // ELSE we're left of S2bc boundary, so
+                               return B2cS.T_pX(p,X);              //     use sub-Region 2c formulation
                        }; break;
         case REGION_3: if (inkey == IF97_HMASS){
                            if (X <= Backwards::H3ab_p(p))
@@ -4160,7 +4172,7 @@ namespace IF97
             return RegionOutput( IF97_HMASS,RegionOutputBackward(Pmax,s,IF97_SMASS),Pmax, NONE);
         else { 
         // Determining H(s) along Tmax is difficult because there is no direct p(T,s) formulation.
-        // This linear combination fit h(s)=a*ln(s)+b/s+c/s²+d is not perfect, but it's close
+        // This linear combination fit h(s)=a*ln(s)+b/s+c/sÂ²+d is not perfect, but it's close
         // and can serve as a limit along that Tmax boundary. Coefficients in HTmaxdata above.
         // There is a better way to do this using Newton-Raphson on Tmax = T(p,s), but it is iterative and slow.
             double ETA = Hmax_n[0]*log(sigma) + Hmax_n[1]/sigma + Hmax_n[2]/pow(sigma,2) +Hmax_n[3];
@@ -4311,14 +4323,14 @@ namespace IF97
     inline double cvmass_Tp(double T, double p){ return RegionOutput( IF97_CVMASS, T, p, NONE); };
     /// Get the speed of sound [m/s] as a function of T [K] and p [Pa]
     inline double speed_sound_Tp(double T, double p){ return RegionOutput( IF97_W, T, p, NONE); };
-    /// Get the [d(rho)/d(p)]T [kg/m³/Pa] as a function of T [K] and p [Pa]
+    /// Get the [d(rho)/d(p)]T [kg/mÂ³/Pa] as a function of T [K] and p [Pa]
     inline double drhodp_Tp(double T, double p){ return RegionOutput( IF97_DRHODP, T, p, NONE); };
 
     // ******************************************************************************** //
     //                            Transport Properties                                  //
     // ******************************************************************************** //
 
-    /// Get the viscosity [Pa-s] as a function of T [K] and Rho [kg/m³]
+    /// Get the viscosity [Pa-s] as a function of T [K] and Rho [kg/mÂ³]
     inline double visc_TRho(double T, double rho) {	
         // Since we have density, we don't need to determine the region for viscosity.
         static Region1 R1;  // All regions use base region equations for visc(T,rho).
